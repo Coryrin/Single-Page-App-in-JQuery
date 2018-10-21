@@ -1,0 +1,37 @@
+<?php
+
+    // headers
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: POST');
+    header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type,Access-Control-Allow-Methods, X-Requested-With');
+    header('Content-Type: application/json');
+
+    include_once '../../config/Database.php';
+    include_once '../../models/Post.php';
+
+    // instantiate db & connect
+    $database = new Database();
+    $db = $database->connect();
+
+    // instantiate blog post object
+    $post = new Post($db);
+
+    // Get the raw posted data
+    $data = json_decode(file_get_contents("php://input"));
+
+    // asign data to the post
+    $post->title = $data->title;
+    $post->body = $data->body;
+    $post->author = $data->author;
+    $post->category_id = $data->category_id;
+
+    // create the post
+    if($post->create_post()) {
+        echo json_encode(
+            array('message' => 'Post Created')
+        );
+    } else {
+        echo json_encode(
+            array('message' => 'Post Not Created')
+        );
+    }
